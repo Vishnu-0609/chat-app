@@ -1,4 +1,5 @@
 import moment from "moment";
+import { json } from "react-router-dom";
 
 const fileFormat = (url="") => {
     const fileExtension = url.split(".").pop();
@@ -16,7 +17,8 @@ const fileFormat = (url="") => {
 };
 
 const tranformImage = (url="",width=100) => {
-    return url;
+    const newUrl = url.replace("upload/",`upload/dpr_auto/w_${width}/`);
+    return newUrl;
 }
 
 const getLast7Days = () => {
@@ -30,4 +32,43 @@ const getLast7Days = () => {
     return last7Days;
 };
 
-export {fileFormat,tranformImage,getLast7Days}
+const getOrSaveMessagesAlertInLocalStorage = ({key,value,get}) => {
+    if(get)
+    {
+        if(localStorage.getItem(key))
+        {
+            return JSON.parse(localStorage.getItem(key));
+        }
+        else
+        {
+            return null;
+        }
+    }
+    else
+    {
+        localStorage.setItem(key,JSON.stringify(value))
+    }
+}
+
+const getorSaveNotificationsCount = ({key,value,get}) => {
+    if(get)
+    {
+        if(localStorage.getItem(key))
+        {
+            return localStorage.getItem(key)
+        }
+        else
+        {
+            return null;
+        }
+    }
+    else
+    {
+        localStorage.setItem(key,value)
+    }
+}
+
+export {fileFormat,tranformImage,getLast7Days,
+    getOrSaveMessagesAlertInLocalStorage,
+    getorSaveNotificationsCount
+}

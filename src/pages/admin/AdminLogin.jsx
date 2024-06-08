@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
 import {CameraAlt} from "@mui/icons-material";
 import { VisuallyHiddenInput } from '../../components/styles/StyledComponents';
 import {useFileHandler} from "6pp";
 import { Navigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogin, getAdmin } from '../../redux/thunks/admin.thunk';
 
 function AdminLogin() {
 
+  const { isAdmin:IsAdmin } = useSelector(state=>state.auth);
+  const dispatch = useDispatch();
   const [password,setPassword] = useState("");
-  const IsAdmin = true;
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log("Submit");
+    dispatch(adminLogin(password));
   };
+
+  useEffect(()=>{
+    dispatch(getAdmin())
+  },[dispatch])
 
   if(IsAdmin) return <Navigate to="/admin/dashboard"/>;
 

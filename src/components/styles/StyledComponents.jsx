@@ -1,4 +1,4 @@
-import { styled } from '@mui/material';
+import { Skeleton, keyframes, styled } from '@mui/material';
 import { Link as LinkComponent } from 'react-router-dom';
 import { grayColor } from '../constatnts/color';
 
@@ -56,3 +56,12 @@ export const CurveButton = styled("button")`
         background-color:rgba(0,0,0,0.8);
     }
 `
+const bounceAnimation = keyframes`
+    0% { tranform :scale(1); }
+    50% { tranform :scale(1.5); }
+    100% { tranform :scale(1); }
+`
+
+export const BouncingSkeleton = styled(Skeleton)({
+    animation:`${bounceAnimation} 1s infinite`
+})

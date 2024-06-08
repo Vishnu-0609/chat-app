@@ -3,6 +3,8 @@ import { Box, Drawer, Grid, IconButton, Stack, Typography, styled } from "@mui/m
 import React, { useState } from 'react';
 import { Link as LinkComponent, Navigate, useLocation } from "react-router-dom";
 import { adminTabs } from '../constatnts/route';
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogout } from "../../redux/thunks/admin.thunk";
 
 const Link = styled(LinkComponent)`
     text-decoration:none;
@@ -15,10 +17,11 @@ const Link = styled(LinkComponent)`
 `
 
 const Sidebar = ({w="100%"}) =>{
+    const dispatch = useDispatch();
     const location = useLocation();
 
     const logoutHandler = () => {
-        console.log("log out");
+        dispatch(adminLogout());
     };
 
     return (
@@ -48,10 +51,9 @@ const Sidebar = ({w="100%"}) =>{
     )
 }
 
-const isAdmin = true;
-
 const AdminLayout = ({children}) => {
 
+    const {isAdmin} = useSelector(state=>state.auth);
     const [isMobile,setIsMobile] = useState(false);
 
     const handleMobile = () => {

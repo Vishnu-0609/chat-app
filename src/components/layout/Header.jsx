@@ -1,5 +1,5 @@
-import { AppBar, Backdrop, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
-import React, { Suspense, lazy, useState } from 'react'
+import { AppBar, Backdrop, Badge, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
+import React, { Suspense, lazy, useEffect, useState } from 'react'
 import { orange } from '../constatnts/color.js';
 import {Add, Group, Logout, Menu as MenuIcon,Search as SearchIcon,Notifications} from "@mui/icons-material";
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,9 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsMobile, setIsNewGroup, setIsNotification, setIsSearch } from '../../redux/slices/misc.js';
+import { resetNoficationCount } from '../../redux/slices/chat.js';
+import { getorSaveNotificationsCount } from '../../lib/features.js';
+import { NEW_REQUEST } from '../constatnts/events.js';
 
 const SearchDialog = lazy(()=>import("../specific/Search.jsx"));
 const NotificationDialog = lazy(()=>import("../specific/Notification.jsx"));
@@ -19,8 +22,13 @@ function Header() {
     const navigate = useNavigate();
 
     const { isNotification,isNewGroup,isSearch } = useSelector(state=>state.misc);
+    const { notificationCount } = useSelector(state=>state?.chat);
 
     const dispatch = useDispatch();
+
+    useEffect(()=>{
+        getorSaveNotificationsCount({key:NEW_REQUEST,value:notificationCount});
+    },[notificationCount])
 
     const handleMobile = () =>
     {
@@ -57,6 +65,7 @@ function Header() {
 
     const openNotification = () => {
         dispatch(setIsNotification(true))
+        dispatch(resetNoficationCount());
     }
 
   return (
@@ -91,7 +100,9 @@ function Header() {
                         </Tooltip>
                         <Tooltip title="Notifications">
                             <IconButton color='inherit' size="large" onClick={openNotification}>
-                                <Notifications/>
+                                {
+                                    notificationCount > 0 ? <Badge badgeContent={notificationCount} color='error'><Notifications/></Badge> : <Notifications/>
+                                }
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Logout">

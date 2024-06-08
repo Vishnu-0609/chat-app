@@ -2,7 +2,7 @@ import React from 'react'
 import { tranformImage } from '../../lib/features';
 import { FileOpen as FileOpenIcon } from '@mui/icons-material';
 
-function RenderAttachment({file,url}) {
+function RenderAttachment(file,url) {
    switch (file) {
     case "video":
         return <video src={url} preload='none' width={"200px"} controls/>;

@@ -109,12 +109,12 @@ export const sampleData = [
 
 export const sampleUsers = [
     {
-        avatar:["https://www.w3schools.com/howto/img_avatar.png"],
+        avatar:"https://www.w3schools.com/howto/img_avatar.png",
         name:"Vishnu Mandlesara",
         _id:"1",
     },
     {
-        avatar:["https://www.w3schools.com/howto/img_avatar.png","https://www.w3schools.com/howto/img_avatar.png","https://www.w3schools.com/howto/img_avatar.png","https://www.w3schools.com/howto/img_avatar.png"],
+        avatar:"https://www.w3schools.com/howto/img_avatar.png",
         name:"Vishnu",
         _id:"2",
     },

@@ -1,12 +1,13 @@
-import React,{Suspense, lazy, useEffect} from 'react';
-import {BrowserRouter as Router,Routes,Route} from "react-router-dom";
-import ProtectRoute from './components/auth/ProtectRoute.jsx';
-import Loaders from './components/layout/Loaders.jsx';
 import axios from "axios";
-import { server } from './components/constatnts/config.js';
-import { useDispatch,useSelector } from "react-redux";
-import { userExists, userNotExists } from './redux/slices/auth.js';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { SocketProvider } from './Socket.jsx';
+import ProtectRoute from './components/auth/ProtectRoute.jsx';
+import { server } from './components/constatnts/config.js';
+import Loaders from './components/layout/Loaders.jsx';
+import { userExists, userNotExists } from './redux/slices/auth.js';
 
 const Home = lazy(()=>import('./pages/Home.jsx'))
 const Login = lazy(()=>import('./pages/Login.jsx'))
@@ -31,25 +32,25 @@ function App() {
   },[dispatch])
 
   return loader ? <Loaders/> : (
-    <Router>
-      <Suspense fallback={<Loaders/>}>
-        <Routes>
-          <Route element={<ProtectRoute user={user}/>}>
-            <Route path='/' element={<Home />}/>
-            <Route path='/chat/:chatId' element={<Chat/>}/>
-            <Route path='/groups' element={<Group/>}/>
-          </Route>
-          <Route path='/login' element={<ProtectRoute user={!user} redirect='/'><Login/></ProtectRoute>}/>
-          <Route path="/admin" element={<AdminLogin/>}/>
-          <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
-          <Route path="/admin/users" element={<UserManagement/>}/>
-          <Route path="/admin/chats" element={<ChatManagement/>}/>
-          <Route path="/admin/messages" element={<MessageManagement/>}/>
-          <Route path='*' element={<NotFound />}/>
-        </Routes>
-      </Suspense>
-      <Toaster/>
-    </Router>
+      <Router>
+        <Suspense fallback={<Loaders/>}>
+          <Routes>
+            <Route element={<SocketProvider><ProtectRoute user={user}/></SocketProvider>}>
+              <Route path='/' element={<Home />}/>
+              <Route path='/chat/:chatId' element={<Chat/>}/>
+              <Route path='/groups' element={<Group/>}/>
+            </Route>
+            <Route path='/login' element={<ProtectRoute user={!user} redirect='/'><Login/></ProtectRoute>}/>
+            <Route path="/admin" element={<AdminLogin/>}/>
+            <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+            <Route path="/admin/users" element={<UserManagement/>}/>
+            <Route path="/admin/chats" element={<ChatManagement/>}/>
+            <Route path="/admin/messages" element={<MessageManagement/>}/>
+            <Route path='*' element={<NotFound />}/>
+          </Routes>
+        </Suspense>
+        <Toaster/>
+      </Router>
   )
 }
 

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import AdminLayout from '../../components/layout/AdminLayout'
-import Table from '../../components/shared/Table'
-import { Avatar, Stack } from '@mui/material';
-import { dashboardData } from '../../components/constatnts/sampleData';
+import { Avatar, Skeleton } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import AdminLayout from '../../components/layout/AdminLayout';
+import Loaders from '../../components/layout/Loaders.jsx';
+import Table from '../../components/shared/Table';
+import { useErrors } from '../../hooks/hook.jsx';
 import { tranformImage } from '../../lib/features.js';
-import AvatarCard from "../../components/shared/AvatarCard.jsx";
+import { useGetAllUsersQuery } from '../../redux/api/api.js';
 
 const columns = [
   {
@@ -18,7 +19,7 @@ const columns = [
     headerName:"Avatar",
     headerClassName:"table-header",
     width:150,
-    renderCell:(params)=><AvatarCard avatar={params.row.avatar}/>
+    renderCell:(params)=><Avatar alt={params.row.name} src={params.row.avatar}/>
   },
   {
     field:"name",
@@ -48,15 +49,27 @@ const columns = [
 
 function UserManagement() {
 
+  const {isLoading,isError,error,data} = useGetAllUsersQuery();
   const [rows,setRows] = useState([]);
 
-  useEffect(()=>{
-    setRows(dashboardData.users.map(i=>({...i,id:i._id,avatar:tranformImage(i.avatar,50)})));
-  },[])
+  console.log(data);
 
-  return (
+  useEffect(()=>{
+    if(data)
+    {
+      setRows(data?.tranformedUserData.map(i=>({...i,id:i._id,avatar:tranformImage(i.avatar,50)}))); 
+    }
+  },[data])
+
+  useErrors([{isError:isError,error:error}]);
+
+  return isLoading ? <Loaders/> : (
     <AdminLayout>
-        <Table heading={"All User"} columns={columns} rows={rows}/>
+      {
+        isLoading ? <Skeleton height={"100vh"}/> : <>{
+          rows && rows.length > 0 && <Table heading={"All User"} columns={columns} rows={rows}/>
+        }</>
+      }
     </AdminLayout>
   )
 }

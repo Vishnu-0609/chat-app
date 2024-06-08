@@ -7,11 +7,13 @@ import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { server } from '../components/constatnts/config.js';
 import { VisuallyHiddenInput } from '../components/styles/StyledComponents';
-import { userExists } from '../redux/slices/auth';
+import { userExists, userNotExists } from '../redux/slices/auth';
 
 function Login() {
 
     const [isLogin,setIsLogin] = useState(true);
+    const [isLoding,setIsLoding] = useState(false);
+
     const [name,setName] = useState("");
     const [Username,setUsername] = useState("");
     const [bio,setBio] = useState("");
@@ -20,9 +22,15 @@ function Login() {
 
     const avatar = useFileHandler("single");
 
+    const getProfile = async() => {
+        axios.get(`${server}/api/v1/user/profile`,{withCredentials:true}).then(({data})=>dispatch(userExists(data))).catch((error)=>dispatch(userNotExists()))
+    }
+
     const handleSignUp = async (e) =>
     {
         e.preventDefault();
+        setIsLoding(true);
+        const toastId = toast.loading("Signing Up...");
         console.log(name,Username,bio,password,avatar);
 
         const formdata = new FormData();
@@ -40,18 +48,26 @@ function Login() {
                     "Content-Type":"multipart/form-data"
                 }
             })
-            dispatch(userExists(true));
-            toast.success("User Registered Successfully!");
+            console.log(data);
+            // dispatch(userExists(true));
+            getProfile();
+            toast.success("User Registered Successfully!",{id:toastId});
         } 
         catch (error) 
         {
-            toast.error(error?.response?.data?.message || "Something Went Wrong");
+            toast.error(error?.response?.data?.message || "Something Went Wrong",{id:toastId});
+        }
+        finally
+        {
+            setIsLoding(false);
         }
     }
 
     const handleLogin = async (e) =>
     {
         e.preventDefault();
+        setIsLoding(true);
+        const toastId = toast.loading("Logging in...");
         try 
         {
             const {data} = await axios.post(`${server}/api/v1/user/login`,{username:Username,password},{
@@ -60,13 +76,18 @@ function Login() {
                     "Content-Type":"application/json"
                 }
             })
-            dispatch(userExists(true));
-            toast.success("User Login Successfully!");
+            getProfile();
+            // dispatch(userExists(true));
+            toast.success("User Login Successfully!",{id:toastId});
         } 
         catch (error) 
         {
-            toast.error(error?.response?.data?.message || "Something Went Wrong");
+            toast.error(error?.response?.data?.message || "Something Went Wrong",{id:toastId});
         } 
+        finally
+        {
+            setIsLoding(false);
+        }
     }
 
   return (
@@ -89,9 +110,9 @@ function Login() {
                     }} onSubmit={handleLogin}>
                         <TextField required fullWidth label="Username" margin='normal' variant='outlined' value={Username} onChange={(e)=>setUsername(e.target.value)}/>
                         <TextField required fullWidth type='password' label="Password" margin='normal' variant='outlined' value={password} onChange={(e)=>setPassword(e.target.value)}/>
-                        <Button sx={{marginTop:"1rem"}} variant='contained' fullWidth color='primary' type='submit'>Login</Button>
+                        <Button sx={{marginTop:"1rem"}} disabled={isLoding} variant='contained' fullWidth color='primary' type='submit'>Login</Button>
                         <Typography textAlign={"center"} m={"1rem"}>OR</Typography>
-                        <Button variant='text' fullWidth onClick={()=>setIsLogin(false)}>Sign Up Instead</Button>
+                        <Button variant='text' fullWidth disabled={isLoding} onClick={()=>setIsLogin(false)}>Sign Up Instead</Button>
                     </form>
                 </>
                 :
@@ -133,9 +154,9 @@ function Login() {
                         <TextField required fullWidth label="Bio" margin='normal' variant='outlined' value={bio} onChange={(e)=>setBio(e.target.value)}/>
                         <TextField required fullWidth label="Username" margin='normal' variant='outlined' value={Username} onChange={(e)=>setUsername(e.target.value)}/>
                         <TextField required fullWidth type='password' label="Password" margin='normal' variant='outlined' value={password} onChange={(e)=>setPassword(e.target.value)}/>
-                        <Button sx={{marginTop:"1rem"}} variant='contained' fullWidth color='primary' type='submit'>Sign Up</Button>
+                        <Button sx={{marginTop:"1rem"}} variant='contained' disabled={isLoding} fullWidth color='primary' type='submit'>Sign Up</Button>
                         <Typography textAlign={"center"} m={"1rem"}>OR</Typography>
-                        <Button variant='text' fullWidth onClick={()=>setIsLogin(prev=>!prev)}>Login Instead</Button>
+                        <Button variant='text' fullWidth disabled={isLoding} onClick={()=>setIsLogin(prev=>!prev)}>Login Instead</Button>
                     </form>
                 </>
             }
