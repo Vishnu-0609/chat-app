@@ -1,0 +1,16 @@
+version: '3.8'
+name: 'whatsapp-chat-app'
+
+services:
+  client:
+    image: "vishnu0609/whatsapp-client"
+    container_name: 'app'
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+  server:
+    image: "vishnu0609/whatsapp-server"
+    container_name: 'server'
+    ports:
+      - "3000:3000"
